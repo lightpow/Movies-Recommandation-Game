@@ -19,6 +19,6 @@ int main()
     }
     GameEngine engine;
     engine.run();
-    std::cout << "Have a nice day!" << std::endl;
+    std::cout << "\nHave a nice day!" << std::endl;
     return EXIT_SUCCESS;
 }
