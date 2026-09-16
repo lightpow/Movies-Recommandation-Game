@@ -203,7 +203,7 @@ int GameEngine::play_part() {
             std::this_thread::sleep_for(50ms);
             std::vector<double> features = _rs->get_features(target.movie);
             std::this_thread::sleep_for(50ms);
-            std::cout << "Features: ";
+            std::cout << "Global Rates: ";
             std::this_thread::sleep_for(50ms);
             size_t i = 0;
             for (;i < features.size() && i < _feature_names.size(); ++i)
