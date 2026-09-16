@@ -36,11 +36,11 @@ int GameEngine::score_to_level(double score)
 std::string GameEngine::get_level_emoji(int level)
 {
     switch (level) {
-        case 1: return "🤢 (Very Bad)";
-        case 2: return "👎 (Bad)";
-        case 3: return "😐 (Average)";
-        case 4: return "👍 (Good)";
-        case 5: return "🤩 (Excellent)";
+        case 1: return "🤢";
+        case 2: return "👎";
+        case 3: return "😐";
+        case 4: return "👍";
+        case 5: return "🤩";
         default: return "❓";
     }
 }
