@@ -31,13 +31,6 @@ struct GameTarget {
     std::string challenge_type;
     double predicted_score;
     int expected_level;
-
-    /**
-     *
-     * @param other
-     * @return true if this equal other, false otherwise.
-     */
-    bool operator==(const GameTarget& other) const;
 };
 
 class GameEngine {
@@ -50,13 +43,6 @@ private:
         "Horror", "Comedy", "Drama", "Adventure", "Fiction"
     };
 
-    /**
-     * a compare functor for the sp_movie type.
-     */
-    struct GameTarget_Comp
-    {
-        bool operator()(const GameTarget& lhs, const GameTarget& rhs) const;
-    };
 
     /**
      * Converts a continuous movie rating (1.0 to 10.0) into a discrete 5-level scale.

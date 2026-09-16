@@ -10,15 +10,6 @@
 
 using namespace std::chrono_literals;
 
-bool GameTarget::operator==(const GameTarget &other) const
-{
-    int res = 1;
-    res = res && Sp_movie_compare()(this->movie, other.movie);
-    res = res && ( this->expected_level == other.expected_level);
-    res = res && ( this->predicted_score == other.predicted_score);
-    res = res && ( this->challenge_type == other.challenge_type);
-    return res;
-}
 
 GameEngine::GameEngine() : _current_part(1), _rs(nullptr) {}
 
@@ -46,11 +37,6 @@ std::string GameEngine::get_level_emoji(int level)
 }
 
 
-bool GameEngine::GameTarget_Comp::operator()(const GameTarget& lhs,
-                                                const GameTarget& rhs) const
-{
-    return Sp_movie_compare()(lhs.movie, rhs.movie);
-}
 
 std::vector<sp_movie> GameEngine::get_animal_hints(const User& animal) const
 {
@@ -171,24 +157,24 @@ int GameEngine::play_part() {
         }
 
         // 2. Generate Challenges
-        std::set<GameTarget, GameTarget_Comp> targets;
+        std::vector<GameTarget> targets;
 
         sp_movie cf_movie = animal.get_rs_recommendation_by_cf(k);
         double cf_score = animal.get_rs_prediction_score_for_movie(
                                 cf_movie->get_name(), cf_movie->get_year(), k);
-        targets.insert({cf_movie, "CF Top Pick",
+        targets.push_back({cf_movie, "CF Top Pick",
                                     cf_score, score_to_level(cf_score)}
                                     );
 
         sp_movie content_movie = animal.get_rs_recommendation_by_content();
         double content_score = animal.get_rs_prediction_score_for_movie(
                     content_movie->get_name(), content_movie->get_year(), k);
-        targets.insert({content_movie, "Content Top Pick",
+        targets.push_back({content_movie, "Content Top Pick",
                                 content_score, score_to_level(content_score)}
                                 );
 
-        targets.insert(get_wildcard_target(animal, k));
-        targets.insert(get_worst_match_target(animal, k));
+        targets.push_back(get_wildcard_target(animal, k));
+        targets.push_back(get_worst_match_target(animal, k));
 
         // 3. Execute Challenges
         int idx = 1;
@@ -202,13 +188,13 @@ int GameEngine::play_part() {
             std::this_thread::sleep_for(50ms);
             std::vector<double> features = _rs->get_features(target.movie);
             std::this_thread::sleep_for(50ms);
-            std::cout << "Global Rates: ";
+            std::cout << "Global Rate: ";
             std::this_thread::sleep_for(50ms);
             size_t i = 0;
             for (;i < features.size() && i < _feature_names.size(); ++i)
             {
                 std::cout << _feature_names[i]
-                << "(" << get_level_emoji(score_to_level(features[i])) << ") ";
+                << "( " << get_level_emoji(score_to_level(features[i])) << " ) ";
             }
             std::cout << "\n";
             
