@@ -51,6 +51,14 @@ private:
     };
 
     /**
+     * a compare functor for the sp_movie type.
+     */
+    struct GameTarget_Comp
+    {
+        bool operator()(const GameTarget& lhs, const GameTarget& rhs) const;
+    };
+
+    /**
      * Converts a continuous movie rating (1.0 to 10.0) into a discrete 5-level scale.
      * Maps the intervals in steps of 2.0 to categorize the score.
      * @param score the predicted or actual double score of the movie.

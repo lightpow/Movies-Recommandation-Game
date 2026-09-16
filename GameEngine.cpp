@@ -46,6 +46,12 @@ std::string GameEngine::get_level_emoji(int level)
 }
 
 
+bool GameEngine::GameTarget_Comp::operator()(const GameTarget& lhs,
+                                                const GameTarget& rhs) const
+{
+    return Sp_movie_compare()(lhs.movie, rhs.movie);
+}
+
 std::vector<sp_movie> GameEngine::get_animal_hints(const User& animal) const
 {
     Movies_Features rated_map = _rs->movies_filter(false, animal);
@@ -165,39 +171,32 @@ int GameEngine::play_part() {
         }
 
         // 2. Generate Challenges
-        std::vector<GameTarget> targets;
-        
+        std::set<GameTarget, GameTarget_Comp> targets;
+
         sp_movie cf_movie = animal.get_rs_recommendation_by_cf(k);
         double cf_score = animal.get_rs_prediction_score_for_movie(
                                 cf_movie->get_name(), cf_movie->get_year(), k);
-        targets.push_back({cf_movie, "CF Top Pick",
+        targets.insert({cf_movie, "CF Top Pick",
                                     cf_score, score_to_level(cf_score)}
                                     );
 
         sp_movie content_movie = animal.get_rs_recommendation_by_content();
         double content_score = animal.get_rs_prediction_score_for_movie(
                     content_movie->get_name(), content_movie->get_year(), k);
-        targets.push_back({content_movie, "Content Top Pick",
+        targets.insert({content_movie, "Content Top Pick",
                                 content_score, score_to_level(content_score)}
                                 );
 
-        targets.push_back(get_wildcard_target(animal, k));
-        targets.push_back(get_worst_match_target(animal, k));
+        targets.insert(get_wildcard_target(animal, k));
+        targets.insert(get_worst_match_target(animal, k));
 
         // 3. Execute Challenges
-        std::vector<GameTarget> raised_targets;
         int idx = 1;
         for (const auto& target : targets)
         {
-            if (std::find(raised_targets.begin(), raised_targets.end(),
-                                            target) != raised_targets.end())
-            {
-                continue;
-            }
             std::this_thread::sleep_for(100ms);
             total_challenges++;
-            std::cout << "\nChallenge " << idx++ <<" : "
-                      << *(target.movie);
+            std::cout << "\nChallenge " << idx++ <<" : " << *(target.movie);
             
             // Print feature vectors
             std::this_thread::sleep_for(50ms);
@@ -208,7 +207,8 @@ int GameEngine::play_part() {
             size_t i = 0;
             for (;i < features.size() && i < _feature_names.size(); ++i)
             {
-                std::cout << _feature_names[i] << "(" << features[i] << ") ";
+                std::cout << _feature_names[i]
+                << "(" << get_level_emoji(score_to_level(features[i])) << ") ";
             }
             std::cout << "\n";
             
@@ -231,7 +231,6 @@ int GameEngine::play_part() {
                 std::cout << "Wrong! Correct level was: "
                             << get_level_emoji(target.expected_level) << "\n";
             }
-            raised_targets.push_back(target);
         }
     }
 
