@@ -13,13 +13,13 @@ add_executable(easy_guess
         RecommendationSystemLoader.h
         User.h
         UsersLoader.h
+        GameEngine.h
+        Files_Gen.h
         User.cpp
         RecommendationSystem.cpp
         RecommendationSystemLoader.cpp
         UsersLoader.cpp
-        GameEngine.h
         GameEngine.cpp
-        main.cpp
-        Files_Gen.h
         Files_Gen.cpp
+        main.cpp
 )
